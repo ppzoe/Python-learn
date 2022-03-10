@@ -1,9 +1,9 @@
-'''
+"""
 获取网管信息方法一
-'''
+"""
 import os
 import sys
- 
+
 try:
     import netifaces
 except ImportError:
@@ -11,13 +11,16 @@ except ImportError:
         command_to_execute = "pip install netifaces || easy_install netifaces"
         os.system(command_to_execute)
     except OSError:
-        print ("Can NOT install netifaces, Aborted!")
+        print("Can NOT install netifaces, Aborted!")
         sys.exit(1)
     import netifaces
- 
+
 routingGateway = netifaces.gateways()['default'][netifaces.AF_INET][0]
 routingNicName = netifaces.gateways()['default'][netifaces.AF_INET][1]
- 
+# routingNicMacAddr = netifaces.gateways()['default'][netifaces.AF_INET][2]
+# routingIPAddr = netifaces.gateways()['default'][netifaces.AF_INET][3]
+# routingIPNetmask = netifaces.gateways()['default'][netifaces.AF_INET][4]
+
 for interface in netifaces.interfaces():
     if interface == routingNicName:
         # print netifaces.ifaddresses(interface)
@@ -28,14 +31,13 @@ for interface in netifaces.interfaces():
             routingIPNetmask = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['netmask']
         except KeyError:
             pass
- 
-display_format = '%-30s %-20s'
-print (display_format % ("Routing Gateway:", routingGateway))
-print (display_format % ("Routing NIC Name:", routingNicName))
-print (display_format % ("Routing NIC MAC Address:", routingNicMacAddr))
-print (display_format % ("Routing IP Address:", routingIPAddr))
-print (display_format % ("Routing IP Netmask:", routingIPNetmask))
 
+display_format = '%-30s %-20s'
+print(display_format % ("Routing Gateway:", routingGateway))
+print(display_format % ("Routing NIC Name:", routingNicName))
+print(display_format % ("Routing NIC MAC Address:", routingNicMacAddr))
+print(display_format % ("Routing IP Address:", routingIPAddr))
+print(display_format % ("Routing IP Netmask:", routingIPNetmask))
 
 '''
 获取网关信息方法二
