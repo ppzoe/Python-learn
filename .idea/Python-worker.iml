@@ -18,6 +18,7 @@
       <sourceFolder url="file://$MODULE_DIR$/weixin_crawler-master" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Python-Spider-master/爬虫小demo" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/c20220215/WeChat/web-editor" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/c20220215/wechat-gongzhonghao-crawler-main" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/weixincaught/venv" />
     </content>

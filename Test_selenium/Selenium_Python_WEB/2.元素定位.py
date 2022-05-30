@@ -1,6 +1,9 @@
+import time
 
 from selenium import webdriver
 #创建浏览器对象
+from selenium.webdriver.common.by import By
+from time import sleep
 driver=webdriver.Chrome()
 # 跳转到指定URL
 driver.get('http://www.baidu.com')
@@ -59,4 +62,6 @@ driver.maximize_window()
 # we_button=driver.find_element_by_css_selector('#su')
 # we_button.click()
 # xpath定位
-driver.find_element_by_xpath("//a[text()='新闻']").click()
+driver.find_element(By.XPATH, "//a[text()='新闻']").click()
+time.sleep(5)
+driver.quit()

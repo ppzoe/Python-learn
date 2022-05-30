@@ -57,14 +57,17 @@ def response(flow: http.HTTPFlow) -> None:
         conn = pymysql.connect(host="124.70.0.180", user="root", password="Root@1234.", db='jlrmt')
         cursor = conn.cursor()
 
-        sql = "INSERT INTO man_wx_data(read_num,like_num,biz,title,create_time)VALUES (%s,%s,'%s','%s',str_to_date" \
-              "(\'%s\','%%Y-%%m-%%d %%H:%%i:%%s'))" % \
-              (json_read, json_like, biz, titled, ct)
+        # 数据库字段与微信字段名称有所出入，read_num 阅读数 ，like_num 微信为old_like_num 点赞数，biz 用来识别微信公众号，title文字名称，
+        # create_time文章发布时间，look_num 微信为 like_num 再看数 注意与点赞的区分
+        sql = "INSERT INTO man_wx_data(read_num,like_num,look_num,biz,title,create_time)VALUES (%s,%s,%s,'%s','%s'," \
+              "str_to_date(\'%s\','%%Y-%%m-%%d %%H:%%i:%%s'))" % \
+              (json_read, json_old_like, json_like, biz, titled, ct)
         try:
             # 执行SQL语句
             cursor.execute(sql)
             # 提交事务到数据库执行
             conn.commit()  # 事务是访问和更新数据库的一个程序执行单元
+            print("存储成功！！！！")
         except:
             # 如果发生错误则执行回滚操作
             conn.rollback()
