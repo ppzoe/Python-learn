@@ -76,7 +76,7 @@ def response(flow: http.HTTPFlow) -> None:
         cursor.close()
         # 关闭数据库连接
         conn.close()
-        exit()  # 退出数据监控
+        # exit()  # 退出数据监控
 
 
 addons = [response]
