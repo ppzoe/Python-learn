@@ -2,27 +2,13 @@ import time
 
 from pywinauto.application import Application
 import pyautogui
+import win32api
+import win32con
 from pywinauto import mouse
 from c20220215.WeChat.settings import oaname, oaX
 
 
-# def zhuye():  # 设置路径到选中列表项目 SelectListItem
-#     if len(SelectListItem.children()[0].children()[1].children()) == 3:
-#         SelectSession = SelectListItem.children()[0].children()[1].children()[2]
-#         return SelectSession
-#     elif len(SelectListItem.children()[0].children()[1].children()) == 2:
-#         SelectSession = SelectListItem.children()[0].children()[1].children()[1]
-#         return SelectSession
-#     else:
-#         print("此用户没有消息")
-#     # # 设置路径到 选中会话 SelectSession ps:自定义函数，内容组样式不同一导致路径不同一，可用此函数判断，也就是订阅号消息主页
-#     # SelectSession = SelectListItem.children()[0].children()[1].children()[2]
-
-# def mosu():  # 获取点击后鼠标的位置并存储
-#     x, y = pyautogui.position()
-#     return x,y
-
-def zhuye(SelectListItem,app2):  # zhuye()函数，判断并循环点击每一组的文章，判断文章样式选择不同路径
+def zhuye(SelectListItem, app2):  # zhuye()函数，判断并循环点击每一组的文章，判断文章样式选择不同路径
     if len(SelectListItem.children()[0].children()[1].children()) == 3:
         SelectSession = SelectListItem.children()[0].children()[1].children()[2]
         # 设置路径到 选中会话 SelectSession ps:自定义函数，内容组样式不同一导致路径不同一，可用此函数判断，也就是订阅号消息主页
@@ -42,7 +28,8 @@ def zhuye(SelectListItem,app2):  # zhuye()函数，判断并循环点击每一�
             # 关闭 正文 Close SubscriptionBody
             dlg1.close()
             # 列表向下移动12个滚轮的距离
-            mouse.scroll(coords=(x, y), wheel_dist=-4)
+            # mouse.scroll(coords=(x, y), wheel_dist=-4)
+            win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -530)
 
             # leibiao1 一组文章中除去首个文章的列表
             leibiao1 = SelectSession.children()[2].children_texts()  # children_texts()获取控件子项的文本
@@ -51,7 +38,6 @@ def zhuye(SelectListItem,app2):  # zhuye()函数，判断并循环点击每一�
 
             for i in range(len(leibiao1)):  # 遍历此组剩下的文章
                 time.sleep(1)
-
                 leibiao2 = SelectSession.children()[2].children()[i].children()[0].children()[1]
                 leibiao2.click_input()  # 点击
                 # 等待 正文加载
@@ -59,8 +45,10 @@ def zhuye(SelectListItem,app2):  # zhuye()函数，判断并循环点击每一�
                 # 关闭 正文 Close SubscriptionBody
                 print(type(dlg1))
                 dlg1.close()
-                # 列表向下移动6个滚轮的距离
-                mouse.scroll(coords=(x, y), wheel_dist=-2)
+                # 鼠标位置回到记录点
+                mouse.scroll(coords=(x, y))
+                # 鼠标向下滚动一定距离
+                win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -290)
         elif len(SelectSession.children()) == 2:  # 判断文章组没有首篇放大文章组时，执行此分支
             # 获取点击后鼠标的位置并存储
             x, y = pyautogui.position()
@@ -78,8 +66,10 @@ def zhuye(SelectListItem,app2):  # zhuye()函数，判断并循环点击每一�
                 # 关闭 正文 Close SubscriptionBody
                 print(type(dlg1))
                 dlg1.close()
-                # 列表向下移动6个滚轮的距离
-                mouse.scroll(coords=(x, y), wheel_dist=-2)
+                # 鼠标位置回到记录点
+                mouse.scroll(coords=(x, y))
+                # 鼠标控制列表向下滚动一定距离
+                win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -320)
 
     elif len(SelectListItem.children()[0].children()[1].children()) == 2:
         SelectSession = SelectListItem.children()[0].children()[1].children()[1]
@@ -97,12 +87,15 @@ def zhuye(SelectListItem,app2):  # zhuye()函数，判断并循环点击每一�
 
         # 关闭 正文 Close SubscriptionBody
         dlg1.close()
-        # 列表向下移动15个滚轮的距离
-        mouse.scroll(coords=(x, y), wheel_dist=-5)
+        # 鼠标位置回到记录点
+        mouse.scroll(coords=(x, y))
+        # 鼠标向下滚动一定距离
+        win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -550)
         time.sleep(1)
 
     else:
         print("此用户没有消息")
+
 
 def min():
     # 获取屏幕分辨率，以便后面pyaotogui定位
@@ -130,25 +123,20 @@ def min():
         Sessions = dlg[u"会话列表"]
 
         # 设置路径到公众号文章列表 ListBox
-        ListBox = Sessions.children()[0].children()[2].children()[0].children()[0].children()[0].children()[1].children()[0]
-        if len(ListBox.items()) < int(oaX):  # lst 公众号有几列文章，小于"oaX"列选择列数，大于"oaX"选"oaX"  ps：一般情况一天发布一列,oaX可在settings中设置
-            lst = len(ListBox.items()) - 1
-        else:
-            lst = int(oaX)
-        for a in range(lst):
-            # 设置路径到公众号文章列表中发布内容组的列表 SelectListItem
-            print("第" + str(a) + "组")
-            SelectListItem = ListBox.children()[a + 1]
-            zhuye(SelectListItem, app2)
+        ListBox = \
+            Sessions.children()[0].children()[2].children()[0].children()[0].children()[0].children()[1].children()[0]
 
+        for a in range(oaX):  # oaX可在settings中设置，控制每个公众号循环查询的组数
+            try:  # 组数低于oaX时会报错，indexerror 则跳出循环
+                # 设置路径到公众号文章列表中发布内容组的列表 SelectListItem
+                print("第" + str(a + 1) + "组")
+                SelectListItem = ListBox.children()[a + 1]
+                zhuye(SelectListItem, app2)
+            except IndexError:
+                break
+            except Exception as e:
+                print(e)
 
-
-    # leibiao3 = dlg.child_window().window(LocalizedControlType="ListItem")  # 选择到列表项目
-    # leibiao2.print_control_identifiers()
-    print(type(1))
-    # print("ListBox.count(sub, 4, 40) : ", ListBox.count(sub, 4, 40))
-    # print(repr(ListBox))
-    print(len(oaname))
 
 if __name__ == '__main__':
     min()
