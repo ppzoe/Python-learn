@@ -22,13 +22,12 @@ from c20220215.WeChat.settings import oaname, oaX
 #     x, y = pyautogui.position()
 #     return x,y
 
-def zhuye(SelectListItem,app2):
+def zhuye(SelectListItem,app2):  # zhuye()函数，判断并循环点击每一组的文章，判断文章样式选择不同路径
     if len(SelectListItem.children()[0].children()[1].children()) == 3:
         SelectSession = SelectListItem.children()[0].children()[1].children()[2]
         # 设置路径到 选中会话 SelectSession ps:自定义函数，内容组样式不同一导致路径不同一，可用此函数判断，也就是订阅号消息主页
         if len(SelectSession.children()) == 3:  # 判断文章组是否首篇文章放大，放大执行此分支
             # leibiao 一组文章中的第一个
-            # zhuye() 自定义函数，内容组样式不同一导致路径不同一，可用此函数判断 SelectSession
             leibiao = SelectSession.children()[0].children()[0].children()[1]
             leibiao.click_input()  # 点击
             # 获取点击后鼠标的位置并存储
@@ -81,9 +80,6 @@ def zhuye(SelectListItem,app2):
                 dlg1.close()
                 # 列表向下移动6个滚轮的距离
                 mouse.scroll(coords=(x, y), wheel_dist=-2)
-
-
-
 
     elif len(SelectListItem.children()[0].children()[1].children()) == 2:
         SelectSession = SelectListItem.children()[0].children()[1].children()[1]
@@ -139,7 +135,6 @@ def min():
             lst = len(ListBox.items()) - 1
         else:
             lst = int(oaX)
-
         for a in range(lst):
             # 设置路径到公众号文章列表中发布内容组的列表 SelectListItem
             print("第" + str(a) + "组")
