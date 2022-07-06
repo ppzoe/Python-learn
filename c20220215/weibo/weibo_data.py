@@ -8,17 +8,17 @@ from datetime import datetime
 
 def con():
     # 数据存储
-    # conn = pymysql.connect(host="124.70.0.180", user="root", password="Root@1234.", db='jlrmt', charset='utf8mb4')
-    conn = pymysql.connect(host="localhost", user="root", password="root123456", db='weibo', charset='utf8mb4')
+    conn = pymysql.connect(host="124.70.0.180", user="root", password="Root@1234.", db='jlrmt', charset='utf8mb4')
+    # conn = pymysql.connect(host="localhost", user="root", password="root123456", db='weibo', charset='utf8mb4')
     cursor = conn.cursor()
-    sql = """
-                INSERT INTO weibo_data(name,fans_num,base_url,url,content,relay_num,comment_num,like_num,is_original,uid,send_time)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,str_to_date(%s,"%%Y-%%m-%%d %%H:%%i:%%s"))
-                """
     # sql = """
-    #         INSERT INTO man_weibo_data(name,fans_num,base_url,url,content,relay_num,comment_num,like_num,is_original,uid,send_time)
-    #         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,str_to_date(%s,"%%Y-%%m-%%d %%H:%%i:%%s"))
-    #         """
+    #             INSERT INTO weibo_data(name,fans_num,base_url,url,content,relay_num,comment_num,like_num,is_original,uid,send_time)
+    #             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,str_to_date(%s,"%%Y-%%m-%%d %%H:%%i:%%s"))
+    #             """
+    sql = """
+            INSERT INTO man_weibo_data(name,fans_num,base_url,url,content,relay_num,comment_num,like_num,is_original,uid,send_time)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,str_to_date(%s,"%%Y-%%m-%%d %%H:%%i:%%s"))
+            """
     try:
         # # 执行SQL语句 ,提交单行数据
         # cursor.execute(sql, w2)

@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['F:\\Python-worker\\c20220215\\weibo\\weibo_data.py'],
+    ['weibo_data.py'],
     pathex=[],
     binaries=[],
     datas=[],
