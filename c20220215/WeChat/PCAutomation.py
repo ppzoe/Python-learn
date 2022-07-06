@@ -1,11 +1,36 @@
 import time
-
+import re
+import datetime
 from pywinauto.application import Application
 import pyautogui
 import win32api
 import win32con
 from pywinauto import mouse
 from c20220215.WeChat.settings import oaname, oaX
+
+
+def release_time(SelectListItem,theTime):  # 公众号发布时间
+    time.sleep(2)
+    # release_time1 = dlg.children()[1].children()[0].children()[0]
+    release_time1 = SelectListItem.children()[0].children()[1].children()[0].children()[1]
+    r_time = str(release_time1)
+    # r_1 = re.search(r"(\d{4}-\d{1,2})", r_time).group(0)
+    r_1 = re.search(r'\'(.*?)\'', r_time).group(0) if re.search(r'\'(.*?)\'', r_time) is not None else ''
+    r_list1 = ["星期", "昨天", "期一", "期二", "期三", "期四", "期五", "期六", "期日"]
+    r_list = [" 0", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9"]
+    if r_list1.count(r_1[1:3]) > 0:
+        print(r_1)
+        print(r_1[1:3])
+        r_2 = theTime
+        return r_2
+    elif r_list.count(r_1[1:3]) > 0:
+        print(r_1[1:4])
+        r_2 = theTime
+        return r_2
+    else:
+        pub_Time = r_1[1:8]
+        r_3 = time.strptime(pub_Time, u"%Y年%m月")
+        return r_3
 
 
 def zhuye(SelectListItem, app2):  # zhuye()函数，判断并循环点击每一组的文章，判断文章样式选择不同路径
@@ -20,35 +45,40 @@ def zhuye(SelectListItem, app2):  # zhuye()函数，判断并循环点击每一�
             x, y = pyautogui.position()
             # 等待 正文加载
             time.sleep(5)
-
             # 订阅号正文 SubscriptionBody
             dlg1 = app2.window(class_name='CefWebViewWnd')
             # SubscriptionBody = dlg1.children()[1].children()[0].children()[0]
-
-            # 关闭 正文 Close SubscriptionBody
-            dlg1.close()
-            # 列表向下移动12个滚轮的距离
-            # mouse.scroll(coords=(x, y), wheel_dist=-4)
-            win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -530)
-
-            # leibiao1 一组文章中除去首个文章的列表
-            leibiao1 = SelectSession.children()[2].children_texts()  # children_texts()获取控件子项的文本
-            nlists = len(leibiao1)  # 一组文章中除去首个文章,其余文章的数量
-            print("剩余文章" + str(nlists))
-
-            for i in range(len(leibiao1)):  # 遍历此组剩下的文章
-                time.sleep(1)
-                leibiao2 = SelectSession.children()[2].children()[i].children()[0].children()[1]
-                leibiao2.click_input()  # 点击
-                # 等待 正文加载
-                time.sleep(5)
-                # 关闭 正文 Close SubscriptionBody
-                print(type(dlg1))
+            # 判断日期，与设置年月时间相同则会停止对此公众号的遍历
+            if mi_time > release_time(SelectListItem, theTime):
                 dlg1.close()
-                # 鼠标位置回到记录点
-                mouse.scroll(coords=(x, y))
-                # 鼠标向下滚动一定距离
-                win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -290)
+                print(release_time(SelectListItem, theTime))
+                print(mi_time)
+                deadline.append("截止日期已到达1")
+                return
+
+            else:
+                # 关闭 正文 Close SubscriptionBody
+                dlg1.close()
+                # 列表向下移动12个滚轮的距离
+                # mouse.scroll(coords=(x, y), wheel_dist=-4)
+                win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -480)
+                # leibiao1 一组文章中除去首个文章的列表
+                leibiao1 = SelectSession.children()[2].children_texts()  # children_texts()获取控件子项的文本
+                nlists = len(leibiao1)  # 一组文章中除去首个文章,其余文章的数量
+                print("剩余文章" + str(nlists))
+                for i in range(len(leibiao1)):  # 遍历此组剩下的文章
+                    time.sleep(1)
+                    leibiao2 = SelectSession.children()[2].children()[i].children()[0].children()[1]
+                    leibiao2.click_input()  # 点击
+                    # 等待 正文加载
+                    time.sleep(5)
+                    # 关闭 正文 Close SubscriptionBody
+                    print(type(dlg1))
+                    dlg1.close()
+                    # 鼠标位置回到记录点
+                    mouse.scroll(coords=(x, y))
+                    # 鼠标向下滚动一定距离
+                    win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -280)
         elif len(SelectSession.children()) == 2:  # 判断文章组没有首篇放大文章组时，执行此分支
             # 获取点击后鼠标的位置并存储
             x, y = pyautogui.position()
@@ -69,7 +99,7 @@ def zhuye(SelectListItem, app2):  # zhuye()函数，判断并循环点击每一�
                 # 鼠标位置回到记录点
                 mouse.scroll(coords=(x, y))
                 # 鼠标控制列表向下滚动一定距离
-                win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -320)
+                win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -290)
 
     elif len(SelectListItem.children()[0].children()[1].children()) == 2:
         SelectSession = SelectListItem.children()[0].children()[1].children()[1]
@@ -84,14 +114,21 @@ def zhuye(SelectListItem, app2):  # zhuye()函数，判断并循环点击每一�
         # 订阅号正文 SubscriptionBody
         dlg1 = app2.window(class_name='CefWebViewWnd')
         # SubscriptionBody = dlg1.children()[1].children()[0].children()[0]
-
-        # 关闭 正文 Close SubscriptionBody
-        dlg1.close()
-        # 鼠标位置回到记录点
-        mouse.scroll(coords=(x, y))
-        # 鼠标向下滚动一定距离
-        win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -550)
-        time.sleep(1)
+        # 判断日期，与设置年月时间相同则会停止对此公众号的遍历
+        if mi_time > release_time(SelectListItem, theTime):
+            dlg1.close()
+            print(release_time(SelectListItem, theTime))
+            print(mi_time)
+            deadline.append("截止日期已到达1")
+            return
+        else:
+            # 关闭 正文 Close SubscriptionBody
+            dlg1.close()
+            # 鼠标位置回到记录点
+            mouse.scroll(coords=(x, y))
+            # 鼠标向下滚动一定距离
+            win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -500)
+            time.sleep(1)
 
     else:
         print("此用户没有消息")
@@ -110,6 +147,7 @@ def min():
     dlg = app2.window(class_name='WeChatMainWndForPC')
     # 循环主体 settings文件中设置 oaname ，循环完设置中的oaname为止
     for i in range(len(oaname)):
+        deadline.clear()  # 初始化截止日期判断列表
         # 选中搜索控件
         souso = dlg.child_window(title="搜索", control_type="Edit")
         souso.click_input()
@@ -125,13 +163,17 @@ def min():
         # 设置路径到公众号文章列表 ListBox
         ListBox = \
             Sessions.children()[0].children()[2].children()[0].children()[0].children()[0].children()[1].children()[0]
-
         for a in range(oaX):  # oaX可在settings中设置，控制每个公众号循环查询的组数
             try:  # 组数低于oaX时会报错，indexerror 则跳出循环
                 # 设置路径到公众号文章列表中发布内容组的列表 SelectListItem
                 print("第" + str(a + 1) + "组")
                 SelectListItem = ListBox.children()[a + 1]
                 zhuye(SelectListItem, app2)
+                print(deadline)
+                if not deadline:  # 如果列表为空继续循环
+                    continue
+                else:           # 如果列表不为空跳出本层循环
+                    break
             except IndexError:
                 break
             except Exception as e:
@@ -139,4 +181,11 @@ def min():
 
 
 if __name__ == '__main__':
+    deadline = []
+    print("请输入查询最小日期 如2022年5月 输入'2022-05'")
+    mi_time1 = input("")
+    mi_time = time.strptime(mi_time1, '%Y-%m')
+    ISOTIMEFORMAT = '%Y-%m'
+    the_Time = datetime.datetime.now().strftime(ISOTIMEFORMAT)
+    theTime = time.strptime(the_Time, '%Y-%m')
     min()
