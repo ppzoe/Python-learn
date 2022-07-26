@@ -109,7 +109,7 @@ def zhuye(SelectListItem, app2):  # zhuye()函数，判断并循环点击每一�
         # 获取点击后鼠标的位置并存储
         x, y = pyautogui.position()
         # 等待 正文加载
-        time.sleep(5)
+        time.sleep(4)
 
         # 订阅号正文 SubscriptionBody
         dlg1 = app2.window(class_name='CefWebViewWnd')
@@ -128,7 +128,7 @@ def zhuye(SelectListItem, app2):  # zhuye()函数，判断并循环点击每一�
             mouse.scroll(coords=(x, y))
             # 鼠标向下滚动一定距离
             win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, -500)
-            time.sleep(1)
+            time.sleep(0.5)
 
     else:
         print("此用户没有消息")
@@ -140,7 +140,22 @@ def select_list(Sessions):  # 判断是否需要切换到列表模式
         print("进入传统列表模式")
         Card = Sessions.children()[0].children()[0].children()[0].children()[1].children()[0]  # 切换至列表模式按键路径
         Card.click_input()  # 点击 切换到列表模式
-        time.sleep(1)
+        time.sleep(0.5)
+
+
+def subscription(dlg):  # 进入订阅号列表页面
+    a = "订阅号"
+    # 选中搜索控件
+    souso = dlg.child_window(title="搜索", control_type="Edit")
+    souso.click_input()
+    time.sleep(0.5)
+    # 搜索控件内输入“订阅号”
+    souso.type_keys('^a').type_keys(a, with_spaces=True)
+    time.sleep(0.5)
+    souso.type_keys('{ENTER}')
+    subscribe = dlg["搜索结果"].children()[1].children()[0]
+    subscribe.click_input()
+
 
 def min():
     # 获取屏幕分辨率，以便后面pyaotogui定位
@@ -155,6 +170,8 @@ def min():
     dlg = app2.window(class_name='WeChatMainWndForPC')
     # 设置路径到会话列表 Sessions
     Sessions = dlg[u"会话列表"]
+    # 进入订阅号列表页面
+    subscription(dlg)
     # 调用函数判断是否为列表模式，如不是择自动点击到列表模式
     select_list(Sessions)
     # 循环主体 settings文件中设置 oaname ，循环完设置中的oaname为止
