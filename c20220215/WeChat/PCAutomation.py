@@ -134,6 +134,14 @@ def zhuye(SelectListItem, app2):  # zhuye()函数，判断并循环点击每一�
         print("此用户没有消息")
 
 
+def select_list(Sessions):  # 判断是否需要切换到列表模式
+    model = Sessions.children()[0].children()[0].children()[0].children()[0]
+    if model.texts() == ['订阅号']:    # 如果此路径下texts名称为['订阅号']模式为卡片模式 ，需要点击列表模式按键
+        print("进入传统列表模式")
+        Card = Sessions.children()[0].children()[0].children()[0].children()[1].children()[0]  # 切换至列表模式按键路径
+        Card.click_input()  # 点击 切换到列表模式
+        time.sleep(1)
+
 def min():
     # 获取屏幕分辨率，以便后面pyaotogui定位
     pyautogui.size()
@@ -145,6 +153,10 @@ def min():
     app2 = Application(backend='uia').connect(path="E:\Program Files (x86)\Tencent\WeChat\WeChat.exe")
     # 选择窗口 dlg 微信窗体
     dlg = app2.window(class_name='WeChatMainWndForPC')
+    # 设置路径到会话列表 Sessions
+    Sessions = dlg[u"会话列表"]
+    # 调用函数判断是否为列表模式，如不是择自动点击到列表模式
+    select_list(Sessions)
     # 循环主体 settings文件中设置 oaname ，循环完设置中的oaname为止
     for i in range(len(oaname)):
         deadline.clear()  # 初始化截止日期判断列表
@@ -157,12 +169,9 @@ def min():
         time.sleep(1)
         souso.type_keys('{ENTER}')
 
-        # 设置路径到会话列表 Sessions
-        Sessions = dlg[u"会话列表"]
-
         # 设置路径到公众号文章列表 ListBox
         ListBox = \
-            Sessions.children()[0].children()[2].children()[0].children()[0].children()[0].children()[1].children()[0]
+            Sessions.children()[0].children()[0].children()[2].children()[0].children()[0].children()[0].children()[1].children()[0]
         for a in range(oaX):  # oaX可在settings中设置，控制每个公众号循环查询的组数
             try:  # 组数低于oaX时会报错，indexerror 则跳出循环
                 # 设置路径到公众号文章列表中发布内容组的列表 SelectListItem
