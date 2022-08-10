@@ -4,6 +4,22 @@ import pymysql
 from urllib.parse import quote, unquote
 import time
 import datetime
+from winproxy import ProxySetting
+import atexit
+p = ProxySetting()
+
+
+def set_proxy():
+    """设置系统代理"""
+    p.enable = True
+    p.server = '127.0.0.1:8080'
+    p.registry_write()
+
+
+def close_proxy():
+    """关闭系统代理"""
+    p.enable = False
+    p.registry_write()
 
 
 def b(l_text):  # biz解析
@@ -37,46 +53,52 @@ def title(l_text):  # 标题解析
             return titled
 
 
-def response(flow: http.HTTPFlow) -> None:
-    if "mp.weixin.qq.com/mp/getappmsgext" in flow.request.url:  # 抓取微信数据返回字段,post请求
-        json_text = json.loads(flow.response.text)              # json格式截取回响正文
-        json_read = json_text['appmsgstat'].get("read_num")     # 解析目标数据 阅读数,点赞数据,取消点赞
-        json_like = json_text['appmsgstat'].get('like_num')
-        json_old_like = json_text['appmsgstat'].get('old_like_num')
-        json_request_text = flow.request.get_text()
-        print(json_like, json_read, json_old_like)
-        print("获取成功正在存储")
-        # with open('data.json', 'w') as f:
-        #     json.dump(flow.response.text, f)
-        l_text = json_request_text.split('&')   # 字符串解析,提取解析请求头数据
-        biz = b(l_text)
-        titled = title(l_text)
-        ct = ct_s(l_text)
+class Demo:
+    def __init__(self):
+        set_proxy()
 
-        # 数据存储
-        conn = pymysql.connect(host="124.70.0.180", user="root", password="Root@1234.", db='jlrmt')
-        cursor = conn.cursor()
+    def response(self, flow: http.HTTPFlow) -> None:
+        if "mp.weixin.qq.com/mp/getappmsgext" in flow.request.url:  # 抓取微信数据返回字段,post请求
+            json_text = json.loads(flow.response.text)  # json格式截取回响正文
+            json_read = json_text['appmsgstat'].get("read_num")  # 解析目标数据 阅读数,点赞数据,取消点赞
+            json_like = json_text['appmsgstat'].get('like_num')
+            json_old_like = json_text['appmsgstat'].get('old_like_num')
+            json_request_text = flow.request.get_text()
+            print(json_like, json_read, json_old_like)
+            print("获取成功正在存储")
+            # with open('data.json', 'w') as f:
+            #     json.dump(flow.response.text, f)
+            l_text = json_request_text.split('&')  # 字符串解析,提取解析请求头数据
+            biz = b(l_text)
+            titled = title(l_text)
+            ct = ct_s(l_text)
 
-        # 数据库字段与微信字段名称有所出入，read_num 阅读数 ，like_num 微信为old_like_num 点赞数，biz 用来识别微信公众号，title文字名称，
-        # create_time文章发布时间，look_num 微信为 like_num 再看数 注意与点赞的区分
-        sql = "INSERT INTO man_wx_data(read_num,like_num,look_num,biz,title,create_time)VALUES (%s,%s,%s,'%s','%s'," \
-              "str_to_date(\'%s\','%%Y-%%m-%%d %%H:%%i:%%s'))" % \
-              (json_read, json_old_like, json_like, biz, titled, ct)
-        try:
-            # 执行SQL语句
-            cursor.execute(sql)
-            # 提交事务到数据库执行
-            conn.commit()  # 事务是访问和更新数据库的一个程序执行单元
-            print("存储成功！！！！")
-        except:
-            # 如果发生错误则执行回滚操作
-            conn.rollback()
-            print("回滚，存储失败")
-        # 关闭游标
-        cursor.close()
-        # 关闭数据库连接
-        conn.close()
-        # exit()  # 退出数据监控
+            # 数据存储
+            conn = pymysql.connect(host="124.70.0.180", user="root", password="Root@1234.", db='jlrmt')
+            cursor = conn.cursor()
+
+            # 数据库字段与微信字段名称有所出入，read_num 阅读数 ，like_num 微信为old_like_num 点赞数，biz 用来识别微信公众号，title文字名称，
+            # create_time文章发布时间，look_num 微信为 like_num 再看数 注意与点赞的区分
+            sql = "INSERT INTO man_wx_data(read_num,like_num,look_num,biz,title,create_time)VALUES (%s,%s,%s,'%s','%s'," \
+                  "str_to_date(\'%s\','%%Y-%%m-%%d %%H:%%i:%%s'))" % \
+                  (json_read, json_old_like, json_like, biz, titled, ct)
+            try:
+                # 执行SQL语句
+                cursor.execute(sql)
+                # 提交事务到数据库执行
+                conn.commit()  # 事务是访问和更新数据库的一个程序执行单元
+                print("存储成功！！！！")
+            except:
+                # 如果发生错误则执行回滚操作
+                conn.rollback()
+                print("回滚，存储失败")
+            # 关闭游标
+            cursor.close()
+            # 关闭数据库连接
+            conn.close()
+            # exit()  # 退出数据监控
 
 
-addons = [response]
+addons = [Demo()]
+
+atexit.register(close_proxy)
