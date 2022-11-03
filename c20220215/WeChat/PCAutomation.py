@@ -1,5 +1,5 @@
 import time
-import re
+import re   
 import datetime
 from pywinauto.application import Application
 import pyautogui
@@ -28,8 +28,9 @@ def release_time(SelectListItem,theTime):  # 公众号发布时间
         r_2 = theTime
         return r_2
     else:
-        pub_Time = r_1[1:8]
-        r_3 = time.strptime(pub_Time, u"%Y年%m月")
+        pub_Time = r_1[1:-1]
+        r_3 = time.strptime(pub_Time, u"%Y年%m月%d日  %H:%M")
+        print(r_3)
         return r_3
 
 

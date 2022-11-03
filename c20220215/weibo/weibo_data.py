@@ -132,20 +132,20 @@ def wb_home_data(userid, headers):
 
 
 def wb_Every_data(uid, stat, headers):
-    for page in range(1, 50, 1):
+    for page in range(1, 50, 1):  # 由于无法获取每月最大页数，默认循环查询页数上限为50
         time.sleep(0.1)
         urls = "https://weibo.com/ajax/statuses/mymblog?uid=" + str(uid) + "&page=" + str(
             page) + "&feature=0&stat_date=" + str(stat)
-        for i in range(10):
+        for i in range(10):  # 循环确认是否连接到页面
             wb = requests.get(urls, headers=headers)
-            if wb.status_code != 200:
+            if wb.status_code != 200:  # 不是标准状态码则重新确认
                 time.sleep(15)
                 logging.info("Checking Response Status Code again")
                 continue
             elif wb.status_code == 200:
                 wb.encoding = "utf-8"
                 dic = wb.json()
-                break
+                break  # 获取到页面跳出循环
         try:
             for i in range(20):
                 time.sleep(0.1)
