@@ -5,13 +5,13 @@ weixin_Failuredata = []
 weibo_Failuredata = []
 
 
-def con_weibo(uid):
+def con_weibo(uid, day):
     # 打开数据库连接
     db = MySQLdb.connect("124.70.0.180", "root", "Root@1234.", "jlrmt", charset='utf8mb4')
     # 使用cursor()方法获取操作游标
     cursor = db.cursor()
     # SQL 查询语句
-    sql = "select count(*) from man_weibo_data where uid = '" + uid + "' and left(send_time,7) ='2022-10'"
+    sql = "select count(*) from man_weibo_data where uid = '" + uid + "' and left(send_time,7) ='" + day + "'"
 
     try:
         # 执行SQL语句
@@ -30,13 +30,13 @@ def con_weibo(uid):
     db.close()
 
 
-def con_wechat(biz):
+def con_wechat(biz, day):
     # 打开数据库连接
     db = MySQLdb.connect("124.70.0.180", "root", "Root@1234.", "jlrmt", charset='utf8mb4')
     # 使用cursor()方法获取操作游标
     cursor = db.cursor()
     # SQL 查询语句
-    sql = "select COUNT(*) from man_wx_data where biz='" + biz + "' and left(create_time,7) = '2022-10'"
+    sql = "select COUNT(*) from man_wx_data where biz='" + biz + "' and left(create_time,7) = '" + day + "'"
     try:
         # 执行SQL语句
         cursor.execute(sql)
@@ -55,7 +55,7 @@ def con_wechat(biz):
     db.close()
 
 
-def Qu_Failuredata():
+def Qu_Failuredata(day):
     # 打开excel
     wb = xlrd2.open_workbook('sys_dept.xlsx')
     # 按工作簿定位工作表
@@ -71,17 +71,19 @@ def Qu_Failuredata():
     #     print(sh.row_values(i))
     for i in range(len(biz)):
         print(i+1, biz[i])
-        con_wechat(biz[i])
+        con_wechat(biz[i], day)
     for i in range(len(uid)):
         print(i+1, int(uid[i]))
-        con_weibo(str(int(uid[i])))
+        con_weibo(str(int(uid[i])), day)
 
     print(weixin_Failuredata)
     print(weibo_Failuredata)
 
 
 if __name__ == '__main__':
-    Qu_Failuredata()
+    print("请输入查询月份 如：2022-10")
+    day = input()
+    Qu_Failuredata(day)
 
 
 
